@@ -1,0 +1,28 @@
+
+*** These modified files were found in JOE when it aborted on Mon Apr 29 19:21:52 2019
+*** JOE was aborted because the terminal closed
+
+*** File '.gitignore'
+
+
+*** File '(Unnamed)'
+$t5
+
+*** File '(Unnamed)'
+README
+.gitignore
+Makefile
+.gitignore
+COMMIT_EDITMSG
+README
+out.hdr
+out.hdr
+out.hdr
+out.txt
+.gitignore
+
+*** File '* Startup Log *'
+Processing '/usr/local/Cellar/joe/4.6/etc/joe/joerc'...
+Processing '/usr/local/Cellar/joe/4.6/etc/joe/ftyperc'...
+Finished processing /usr/local/Cellar/joe/4.6/etc/joe/ftyperc
+Finished processing /usr/local/Cellar/joe/4.6/etc/joe/joerc
