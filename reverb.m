@@ -15,7 +15,7 @@
 
 
 % load rir
-a = audioinfo("GalbraithHall.wav"); 
+a = audioinfo("GalbraithHall.wav");
 [rir,fs] = audioread("GalbraithHall.wav");
 %soundsc(rir, fs);
 
@@ -130,10 +130,10 @@ a = [1 zeros(1,M(1)-1) -g];
 x = [1 zeros(1, 4000)]; % comment out to get reverb on man talking
 y = filter(b, a, x);
 
-figure(7)
-plot(y);
-ylabel('Impulse Response');
-xlabel('Time [samples]');
+% figure(7)
+% plot(y);
+% ylabel('Impulse Response');
+% xlabel('Time [samples]');
 
 y = x;
 for n = 1:length(M),
@@ -142,13 +142,58 @@ for n = 1:length(M),
   y = filter(b, a, y);
 end
 
-figure(8)
-plot(y)
-ylabel('Impulse Response');
-xlabel('Time [samples]');
+% figure(8)
+% plot(y)
+% ylabel('Impulse Response');
+% xlabel('Time [samples]');
 
-soundsc(y, fs2);
+allPassIR = y;
 
+%soundsc(y, fs2);
+
+
+%% energy decay relief
+
+frameSizeMS = 30; % minimum frame length, in ms
+overlap = 0.75; % fraction of frame overlapping
+windowType = 'hann'; % type of windowing used for each frame
+
+bits = size(allPassIR);
+
+% calculate STFT frames
+minFrameLen = fs*frameSizeMS/1000; 
+frameLenPow = nextpow2(minFrameLen);
+frameLen = 2^frameLenPow; % frame length = fft size
+eval(['frameWindow = ' windowType '(frameLen);']);
+[B,F,T] = spectrogram(allPassIR,frameWindow,overlap*frameLen,[],fs);
+
+[nBins,nFrames] = size(B);
+
+B_energy = B.*conj(B);
+B_EDR = zeros(nBins,nFrames);
+for i=1:nBins
+    B_EDR(i,:) = fliplr(cumsum(fliplr(B_energy(i,:))));
+end
+B_EDRdb = 10*log10(abs(B_EDR));
+
+% normalize EDR to 0 dB and truncate the plot below a given dB threshold
+offset = max(max(B_EDRdb));
+B_EDRdbN = B_EDRdb-offset;
+
+B_EDRdbN_trunc = B_EDRdbN;
+for i=1:nFrames
+  I = find(B_EDRdbN(:,i) < -70);
+  if (I)
+    B_EDRdbN_trunc(I,i) = -70;
+  end
+end
+
+figure(gcf);clf;
+mesh(T,F/1000,B_EDRdbN_trunc);
+view(130,30);
+title('Normalized Energy Decay Relief (EDR)');
+xlabel('Time (s)');ylabel('Frequency (kHz)');zlabel('Magnitude (dB)');
+axis tight;zoom on;
 
 %% functions
 
@@ -184,7 +229,7 @@ rir = rir';
 numpoints = length(rir);
 rir(1) = 0;
 t = linspace(0,numpoints/22254,numpoints);
-plot(t,rir);
+%plot(t,rir);
 xlabel('elapsed time in seconds');
 
 % integration constant in RMS calculation
@@ -203,9 +248,9 @@ for i = 1:numpoints
 end
 
 RMS = sqrt(average);
-plot(t,RMS), xlabel('elapsed time in seconds'),ylabel('RMS'),grid;
+%plot(t,RMS), xlabel('elapsed time in seconds'),ylabel('RMS'),grid;
 dB = 20 * log(RMS/max(RMS));
-plot(t,dB), xlabel('elapsed time in seconds'), ylabel('dB'),grid;
+%plot(t,dB), xlabel('elapsed time in seconds'), ylabel('dB'),grid;
 
 % fit first-order polynomial
 slope = polyfit(t,dB,1);
