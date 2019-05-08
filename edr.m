@@ -1,7 +1,14 @@
+%
+% function to plot the edr
+%
+% EDR: energy decay relief
+%
+
 function edr(signal, fs)
-frameSizeMS = 30; % minimum frame length, in ms
-overlap = 0.75; % fraction of frame overlapping
-windowType = 'hann'; % type of windowing used for each frame
+
+frameSizeMS = 30;
+overlap = 0.75;
+windowType = 'hann';
 
 bits = size(signal);
 
@@ -33,11 +40,18 @@ for i=1:nFrames
   end
 end
 
-figure(gcf);clf;
+figure(3);clf;
 mesh(T,F/1000,B_EDRdbN_trunc);
 view(130,30);
-title('Normalized Energy Decay Relief (EDR)');
-xlabel('Time (s)');ylabel('Frequency (kHz)');zlabel('Magnitude (dB)');
-axis tight;zoom on;
-%axis([0 0.09 -inf inf -inf inf]);
+%title('Energy Decay Relief');
+xlabel('Time [s]');ylabel('Frequency (kHz)');zlabel('Magnitude (dB)');
+axis tight; zoom on;
+axis([0 2 -inf inf -inf inf]);
 end
+
+
+
+
+
+
+

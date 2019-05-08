@@ -2,19 +2,19 @@
 % This script implements the Moorer reverb algorithm
 % by modifying the Schroeder reverb script. First,
 % an additional step to add early reflections is included.
-% Second, a simple lowpass filter is included in the feedback
+% Second, a simple low?pass filter is included in the feedback
 % path of the comb filters.
 %
 % See also EARLYREFLECTIONS, LPCF
-clear;clc;
-[input,Fs] = audioread('output.wav');
 
-in = mean(input,2);
 
-in = [in;zeros(Fs*3,1)]; % Add zero–padding for reverb tail
+function [out] = MoorerReverb(in, Fs, delay)
 
-% Max delay of 70 ms
-maxDelay = ceil(.07*Fs);
+in = [in;zeros(Fs*3,1)]; % Add zero?padding for reverb tail
+
+% delay = 0.07
+
+maxDelay = ceil(delay*Fs);
 % Initialize all buffers
 buffer1 = zeros(maxDelay,1); buffer2 = zeros(maxDelay,1);
 buffer3 = zeros(maxDelay,1); buffer4 = zeros(maxDelay,1);
@@ -57,10 +57,11 @@ d3,g3,amp3,rate3,fbLPF3);
 d4,g4,amp4,rate4,fbLPF4);
 % Combine parallel paths
 combPar = 0.25*(w1 + w2 + w3 + w4);
-% Two series all–pass filters
+% Two series all?pass filters
 [w5,buffer5] = apf(combPar,buffer5,Fs,n,...
 d5,g5,amp5,rate5);
 [out(n,1),buffer6] = apf(w5,buffer6,Fs,n,...
 d6,g6,amp6,rate6);
 end
-sound(out,Fs);
+
+end

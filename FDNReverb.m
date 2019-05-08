@@ -3,25 +3,24 @@
 % using a Stautner and Puckette matrix.
 %
 % See also MODDELAY
-clear;clc;
 
-[input,Fs] = audioread('output.wav');
+function [out] = FDNReverb(in, Fs, delay)
 % Add extra space at end for the reverb tail
 
-in = mean(input,2);
-in = [in;zeros(Fs*3,1)]; 
+in = [in;zeros(Fs*3,1)];
 
 % Max delay of 70 ms
-maxDelay = ceil(.07*Fs);  
+maxDelay = ceil(delay*Fs);  
 % Initialize all buffers
 buffer1 = zeros(maxDelay,1); buffer2 = zeros(maxDelay,1); 
 buffer3 = zeros(maxDelay,1); buffer4 = zeros(maxDelay,1);  
 
 % Delay and Gain Parameters
-d1 = fix(.0297*Fs); 
-d2 = fix(.0371*Fs); 
-d3 = fix(.0411*Fs); 
-d4 = fix(.0437*Fs); 
+d1 = fix(.0297*Fs);
+d2 = fix(.0371*Fs);
+d3 = fix(.0411*Fs);
+d4 = fix(.0437*Fs);
+
 g11 = 0; g12 = 1; g13 = 1; g14 = 0;  % Stautner and Puckette
 g21 =-1; g22 = 0; g23 = 0; g24 =-1;  % Feed-back Matrix
 g31 = 1; g32 = 0; g33 = 0; g34 =-1;
@@ -43,13 +42,11 @@ fb1 = 0; fb2 = 0; fb3 = 0; fb4 = 0;
 % Gain to control reverb time
 g = .67;
 for n = 1:N
-    
     % Combine input with feed-back for respective delay lines 
     inDL1 = in(n,1) + fb1;
     inDL2 = in(n,1) + fb2;
     inDL3 = in(n,1) + fb3;
     inDL4 = in(n,1) + fb4;
-    
     % Four Parallel Delay Lines
     [outDL1,buffer1] = modDelay(inDL1,buffer1,Fs,n,...
     d1,amp1,rate1);
@@ -75,5 +72,4 @@ for n = 1:N
 end
 
 
-sound(out,Fs);
-
+end
