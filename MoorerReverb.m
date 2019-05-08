@@ -2,7 +2,7 @@
 % This script implements the Moorer reverb algorithm
 % by modifying the Schroeder reverb script. First,
 % an additional step to add early reflections is included.
-% Second, a simple low–pass filter is included in the feedback
+% Second, a simple lowpass filter is included in the feedback
 % path of the comb filters.
 %
 % See also EARLYREFLECTIONS, LPCF
