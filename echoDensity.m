@@ -8,8 +8,8 @@ w = hann(L*2+1);
 w = w/sum(w);
 theta = zeros(1,t2);
 t2-2*L-1
-for n = 1:1:t2-2*L-1
-%for n = 1:1:(t2-2*L-1)/3
+%for n = 1:1:t2-2*L-1
+for n = 1:1:(t2-2*L-1)/3
     segma = sqrt(sum(w.*h(n:n+2*L).^2));
     theta(n) = sum(w.*(abs(h(n:n+2*L))>segma));
 end

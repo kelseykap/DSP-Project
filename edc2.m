@@ -63,6 +63,7 @@ t = linspace(0,numpoints/22254,numpoints);
 slope = polyfit(t,dB1,1);
 slope = slope(1);
 RT = -60/slope(1)
+
 end
 
 

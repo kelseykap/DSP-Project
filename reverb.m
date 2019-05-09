@@ -30,7 +30,7 @@ in = mean(input,2);
 y2 = freqconv(in, rir);
 
 % IMPULSE RESPONSE OF ALLPASS
-y3 = allpass();
+%y3 = allpass(in);
 
 % IMPLEMENT ALGORITHMS WITH DIRAC
 % [SchroederResponse,t1] = impulseResponse(in,Fs,"Schroeder",0.07);
@@ -38,9 +38,14 @@ y3 = allpass();
 % [FDNResponse,t3] = impulseResponse(in,Fs,"FDN",0.07);
 
 % IMPLEMENT ALGORITHMS WITH INPUT
-% [SchroederResponse] = SchroederReverb(in, Fs, 0.07);
-% [MoorerResponse] = MoorerReverb(in,Fs,0.07);
-% [FDNResponse] = FDNReverb(in,Fs,0.07);
+[SchroederResponse] = SchroederReverb(in,Fs,0.07);
+[MoorerResponse] = MoorerReverb(in,Fs,0.07);
+[FDNResponse] = FDNReverb(in,Fs,0.07);
+
+%soundsc(y2, fs)
+%soundsc(SchroederResponse, fs)
+%soundsc(MoorerResponse, fs)
+%soundsc(FDNResponse, fs)
 
 % EDC and RT 
 % [RTir, EDCir] = edc2(rir); 
@@ -55,28 +60,31 @@ y3 = allpass();
 % edr(FDNResponse, Fs)
 
 % ECHO DENSITY
-% [theta,t] = echodensity(rirMono,Fs);
+% [theta,t] = echodensity(rir,Fs);
 % [theta,t] = echodensity(SchroederResponse,Fs);
 % [theta1,t1] = echodensity(FDNResponse,Fs);
 % [theta2,t2]= echodensity(MoorerResponse,Fs);
 
 % CLARITY
-rir2 = power(rir,2);
-int = cumsum(rir2(1:0.8*fs))
-%/cumsum(rir2(0.8*fs:end))
-
+% rir2 = power(rir,2);
+% inta = sum(rir2(1:0.8*fs));
+% intb = sum(rir2(0.8*fs:end));
+% int = inta/intb
 
 
 
 %% PLOTS
 
 % RIR PLOT
+% hold on;
+% plot(t,theta(t));
 % dt = 1/fs;
-% t = 0:dt:(length(rirMono)*dt)-dt;
+% t = 0:dt:(length(in)*dt)-dt;
 % figure(1);
-% plot(t,rirMono)
-% title('Impulse Response of Galbraith Hall');
-% xlabel('Time [s]')
+% plot(t, in, 'black')
+% ylim([-1 1])
+% % %title('Impulse Response of Galbraith Hall');
+% xlabel('Time [s]'), ylabel('Amplitude'), grid();
 
 % ALLPASS RESPONSE
 % dt = 1/fs;
@@ -89,15 +97,15 @@ int = cumsum(rir2(1:0.8*fs))
 
 % FREQUENCY SPECTRUM
 % figure(2);
-% Y = fft(rir);
+% Y = freqz(rir);
 % plot(abs(Y))
 % N = fs; % number of FFT points
 % transform = fft(rir,N)/N;
 % magTransform = abs(transform);
 % faxis = linspace(-fs/2,fs/2,N);
-% plot(faxis,fftshift(magTransform));
+% %plot(faxis,fftshift(magTransform));
 % xlabel('Frequency [Hz]')
-% axis([0 length(faxis)/2, 0 max(magTransform)])
+% %axis([0 length(faxis)/2, 0 max(magTransform)])
 % xt = get(gca,'XTick');  
 % set(gca,'XTickLabel', sprintf('%.0f|',xt))
 
@@ -115,7 +123,7 @@ int = cumsum(rir2(1:0.8*fs))
 % legend('Convolved Signal', 'Original Signal')
 % axis([0 0.7, -inf inf])
 
-% cCONVOLUTIONAL REVERB 2
+% CONVOLUTIONAL REVERB 2
 % figure(4);
 % dt = 1/fs;
 % subplot(2,1,1)
@@ -131,22 +139,32 @@ int = cumsum(rir2(1:0.8*fs))
 % xlabel('Time [s]'),ylabel('Amplitude')
 % axis([0 7, -1 1])
 
-% ALGORITHMIC REVERB IMPULSE RESPONSES
-% subplot(3,1,1);
-% t1 = 0:dt:(length(SchroederResponse)*dt)-dt;
-% plot(t1, SchroederResponse);
-% title("Schroeder's Algorithm")
-% xlim([0 7]);
-% subplot(3,1,2);
-% t2 = 0:dt:(length(MoorerResponse)*dt)-dt;
-% plot(t2, MoorerResponse);
-% title("Moorer's Algorithm")
-% xlim([0 7]);
-% subplot(3,1,3);
-% t3 = 0:dt:(length(FDNResponse)*dt)-dt;
-% plot(t3, FDNResponse);
-% title("FDN Algorithm")
-% xlim([0 7]);
+% ALGORITHMIC REVERB RESPONSES
+subplot(4,1,1);
+figure(1)
+t1 = 0:dt:(length(y2)*dt)-dt;
+plot(t1, y2);
+title("Convolutional Reverb")
+xlabel('Time [s]'), ylabel('Amplitude'),grid;
+xlim([0 7]);
+subplot(4,1,2);
+t1 = 0:dt:(length(SchroederResponse)*dt)-dt;
+plot(t1, SchroederResponse);
+title("Schroeder's Algorithm")
+xlabel('Time [s]'), ylabel('Amplitude'),grid;
+xlim([0 7]);
+subplot(4,1,3);
+t2 = 0:dt:(length(MoorerResponse)*dt)-dt;
+plot(t2, MoorerResponse);
+title("Moorer's Algorithm")
+xlabel('Time [s]'), ylabel('Amplitude'),grid;
+xlim([0 7]);
+subplot(4,1,4);
+t3 = 0:dt:(length(FDNResponse)*dt)-dt;
+plot(t3, FDNResponse);
+title("FDN Algorithm")
+xlabel('Time [s]'), ylabel('Amplitude'),grid;
+xlim([0 7]);
 
 % EDC - ROOM IMPULSE RESPONSE
 % figure(1)
@@ -188,9 +206,9 @@ int = cumsum(rir2(1:0.8*fs))
 % axis([-inf inf, -60 0]) 
 
 % ECHO DENSITY
-% hold on
-% plot(t,theta(t));
-% xlim([300 5E4])
+%  hold on
+%  plot(t,theta(t));
+%  xlim([300 5E4])
 % plot(t2,theta2(t2));
 % xlim([300 5E4])
 % plot(t1,theta1(t1));

@@ -21,7 +21,7 @@ y = ifft(SIG .* IR);
 y = y / max(abs(y));        
 
 % mixes in original signal - can alter percentages
-y = (0.8 * y) + (0.2 * sig);
+y = (0.9 * y) + (0.1 * sig);
 y = y / max(abs(y));
 
 end
